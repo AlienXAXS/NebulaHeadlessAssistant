@@ -9,16 +9,14 @@ namespace NebulaHeadlessAssistant
     [BepInDependency("dsp.nebula-multiplayer")]
     public class Plugin : BaseUnityPlugin
     {
-        [Obfuscation(Exclude = true)]
         private void Awake()
         {
             Log.Init(new BepInExLogger(Logger));
-
-            // Plugin startup logic
             Log.LogInfo($"Plugin {PluginInfo.PLUGIN_NAME} is loading!");
 
             if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("dsp.nebula-multiplayer"))
             {
+                Log.LogInfo("Stage 2");
                 NebulaHeadlessAssistant.Instance.OnAwake();
             }
             else

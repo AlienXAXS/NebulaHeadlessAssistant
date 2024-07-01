@@ -1,5 +1,9 @@
-﻿using NebulaAPI.GameState;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using NebulaAPI.GameState;
 using NebulaAPI;
+using HarmonyLib;
 
 namespace NebulaHeadlessAssistant
 {
@@ -11,54 +15,50 @@ namespace NebulaHeadlessAssistant
         public bool IsMultiplayerActive;
         public bool IsDedicated;
 
+        private readonly Harmony _harmony = new(PluginInfo.PLUGIN_ID);
+
         public void OnAwake()
         {
-            IsMultiplayerActive = NebulaModAPI.IsMultiplayerActive;
-            IsDedicated = NebulaModAPI.MultiplayerSession.IsDedicated;
+            NebulaModAPI.OnMultiplayerGameStarted += OnMultiplayerGameStarted;
+            NebulaModAPI.OnPlayerJoinedGame += OnPlayerJoinedGame;
+            NebulaModAPI.OnPlayerLeftGame += OnPlayerLeftGame;
 
-            var harmony = new HarmonyLib.Harmony(PluginInfo.PLUGIN_ID);
-
-            if (IsDedicated)
+            if (Environment.GetCommandLineArgs().Contains("-server"))
             {
-                Log.LogInfo("Running headless, Applying NebulaHeadlessAssistant.");
-
-                NebulaModAPI.OnMultiplayerGameStarted += OnMultiplayerGameStarted;
-                NebulaModAPI.OnPlayerJoinedGame += OnPlayerJoinedGame;
-                NebulaModAPI.OnPlayerLeftGame += OnPlayerLeftGame;
-
-                //var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "NebulaHeadlessAssistant");
-                harmony.PatchAll(typeof(Patches.NebulaHeadlessAssistant));
-
-                // Only patch ThreatFix if we're on version 0.9.5.2
-                if (BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dsp.nebula-multiplayer", out var pluginInfo))
-                {
-                    if (pluginInfo.Metadata.Version.Equals(new System.Version(0, 9, 5, 2)))
-                    {
-                        Log.LogInfo("Nebula version 0.9.5.2 found, applying Threat Fix patch");
-                        harmony.PatchAll(typeof(Patches.ThreatFix0952));
-                    }
-                }
+                Log.LogInfo("Running headless, Applying NoSteamFix.");
+                _harmony.PatchAll(typeof(Patches.NoSteamFix));
+                //_harmony.PatchAll(typeof(Patches.InitialGame));
+            }
+            else
+            {
+                Log.LogWarning("Not running in -server mode, assuming we are a client.");
             }
         }
 
-        private void OnPlayerLeftGame(IPlayerData obj)
+        private void OnPlayerLeftGame(IPlayerData player)
         {
-            
+            HiveRestorer.HiveRestorerManager.Instance.PlayerLeft();
         }
 
-        private void OnPlayerJoinedGame(IPlayerData obj)
+        private void OnPlayerJoinedGame(IPlayerData player)
         {
-            
+            HiveRestorer.HiveRestorerManager.Instance.PlayerJoined();
         }
 
         private void OnMultiplayerGameStarted()
         {
-            foreach (var hive in GameMain.spaceSector.dfHives)
+            IsMultiplayerActive = NebulaModAPI.IsMultiplayerActive;
+            IsDedicated = NebulaModAPI.MultiplayerSession.IsDedicated;
+            
+            // Only patch ThreatFix if we're on version 0.9.5.2
+            if (IsDedicated && BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dsp.nebula-multiplayer", out var pluginInfo))
             {
-                Log.LogInfo(
-                    $"Hive {hive.hiveAstroId} Threat: {hive.evolve.threat}, Level: {hive.evolve.level}, Units: {hive.units.count}");
+                if (pluginInfo.Metadata.Version.Equals(new System.Version(0, 9, 5, 2)))
+                {
+                    Log.LogInfo("Nebula version 0.9.5.2 found, applying Threat Fix patch");
+                    _harmony.PatchAll(typeof(Patches.ThreatFix0952));
+                }
             }
         }
-        
     }
 }

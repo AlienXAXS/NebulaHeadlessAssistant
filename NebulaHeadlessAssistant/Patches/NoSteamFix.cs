@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using HarmonyLib;
+using NebulaAPI;
 using Steamworks;
 
 namespace NebulaHeadlessAssistant.Patches
 {
-    internal class NebulaHeadlessAssistant
+    internal class NoSteamFix
     {
-
         [HarmonyPrefix]
         [HarmonyPatch(typeof(SteamManager), nameof(SteamManager.Awake))]
         public static bool SteamManagerAwake(SteamManager __instance)
