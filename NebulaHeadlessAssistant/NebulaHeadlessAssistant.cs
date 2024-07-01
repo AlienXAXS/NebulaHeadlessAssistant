@@ -37,12 +37,12 @@ namespace NebulaHeadlessAssistant
 
         private void OnPlayerLeftGame(IPlayerData player)
         {
-            HiveRestorer.HiveRestorerManager.Instance.PlayerLeft();
+            //HiveRestorer.HiveRestorerManager.Instance.PlayerLeft();
         }
 
         private void OnPlayerJoinedGame(IPlayerData player)
         {
-            HiveRestorer.HiveRestorerManager.Instance.PlayerJoined();
+            //HiveRestorer.HiveRestorerManager.Instance.PlayerJoined();
         }
 
         private void OnMultiplayerGameStarted()
