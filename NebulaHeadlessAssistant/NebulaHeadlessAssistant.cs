@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using NebulaAPI.GameState;
+﻿using HarmonyLib;
 using NebulaAPI;
-using HarmonyLib;
+using NebulaAPI.GameState;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace NebulaHeadlessAssistant
@@ -23,7 +22,7 @@ namespace NebulaHeadlessAssistant
             NebulaModAPI.OnPlayerJoinedGame += OnPlayerJoinedGame;
             NebulaModAPI.OnPlayerLeftGame += OnPlayerLeftGame;
 
-            _harmony.PatchAll(typeof(Patches.RelayLogicListener));
+            _harmony.PatchAll(typeof(Patches.PlanetATSheildFix_Headless));
 
             if (Environment.GetCommandLineArgs().Contains("-server"))
             {
@@ -31,7 +30,7 @@ namespace NebulaHeadlessAssistant
                 _harmony.PatchAll(typeof(Patches.NoSteamFix));
 
                 // Hive Restorer Idea
-                _harmony.PatchAll(typeof(Patches.InitialGame));
+                _harmony.PatchAll(typeof(Patches.GameUtility));
                 // Skip this for now as it's not working.
                 //HiveRestorer.HiveRestorerManager.Instance.Init();
             }

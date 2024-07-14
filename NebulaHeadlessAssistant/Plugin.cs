@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using System.Reflection;
-using UnityEngine;
 
 [assembly: ObfuscateAssembly(assemblyIsPrivate: true, StripAfterObfuscation = true)]
 

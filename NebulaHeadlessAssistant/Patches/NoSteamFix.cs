@@ -1,7 +1,6 @@
-﻿using System.Reflection;
-using HarmonyLib;
-using NebulaAPI;
+﻿using HarmonyLib;
 using Steamworks;
+using System.Reflection;
 
 namespace NebulaHeadlessAssistant.Patches
 {
