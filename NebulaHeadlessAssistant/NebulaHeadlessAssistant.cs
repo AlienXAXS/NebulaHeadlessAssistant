@@ -4,6 +4,7 @@ using System.Reflection;
 using NebulaAPI.GameState;
 using NebulaAPI;
 using HarmonyLib;
+using UnityEngine;
 
 namespace NebulaHeadlessAssistant
 {
@@ -12,7 +13,6 @@ namespace NebulaHeadlessAssistant
         private static readonly NebulaHeadlessAssistant _instance;
         public static NebulaHeadlessAssistant Instance = _instance ??= new NebulaHeadlessAssistant();
 
-        public bool IsMultiplayerActive;
         public bool IsDedicated;
 
         private readonly Harmony _harmony = new(PluginInfo.PLUGIN_ID);
@@ -23,42 +23,53 @@ namespace NebulaHeadlessAssistant
             NebulaModAPI.OnPlayerJoinedGame += OnPlayerJoinedGame;
             NebulaModAPI.OnPlayerLeftGame += OnPlayerLeftGame;
 
+            _harmony.PatchAll(typeof(Patches.RelayLogicListener));
+
             if (Environment.GetCommandLineArgs().Contains("-server"))
             {
-                Log.LogInfo("Running headless, Applying NoSteamFix.");
+                IsDedicated = true;
                 _harmony.PatchAll(typeof(Patches.NoSteamFix));
-                //_harmony.PatchAll(typeof(Patches.InitialGame));
+
+                // Hive Restorer Idea
+                _harmony.PatchAll(typeof(Patches.InitialGame));
+                // Skip this for now as it's not working.
+                //HiveRestorer.HiveRestorerManager.Instance.Init();
             }
-            else
+        }
+
+        public void OnGUI()
+        {
+            if (IsDedicated) return;
+
+            Scoreboard.PlayerWindow.Instance.OnGUI();
+
+            if (Event.current.isKey && Event.current.keyCode == KeyCode.Tab)
             {
-                Log.LogWarning("Not running in -server mode, assuming we are a client.");
+                if (Event.current.type == EventType.KeyDown)
+                {
+                    // Show the UI
+                    Scoreboard.PlayerWindow.Instance.SetWindowVisibleState(true);
+                }
+
+                if (Event.current.type == EventType.KeyUp)
+                {
+                    Scoreboard.PlayerWindow.Instance.SetWindowVisibleState(false);
+                }
             }
         }
 
         private void OnPlayerLeftGame(IPlayerData player)
         {
-            //HiveRestorer.HiveRestorerManager.Instance.PlayerLeft();
+            HiveRestorer.HiveRestorerManager.Instance.PlayerLeft();
         }
 
         private void OnPlayerJoinedGame(IPlayerData player)
         {
-            //HiveRestorer.HiveRestorerManager.Instance.PlayerJoined();
+            HiveRestorer.HiveRestorerManager.Instance.PlayerJoined();
         }
 
         private void OnMultiplayerGameStarted()
         {
-            IsMultiplayerActive = NebulaModAPI.IsMultiplayerActive;
-            IsDedicated = NebulaModAPI.MultiplayerSession.IsDedicated;
-            
-            // Only patch ThreatFix if we're on version 0.9.5.2
-            if (IsDedicated && BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("dsp.nebula-multiplayer", out var pluginInfo))
-            {
-                if (pluginInfo.Metadata.Version.Equals(new System.Version(0, 9, 5, 2)))
-                {
-                    Log.LogInfo("Nebula version 0.9.5.2 found, applying Threat Fix patch");
-                    _harmony.PatchAll(typeof(Patches.ThreatFix0952));
-                }
-            }
         }
     }
 }

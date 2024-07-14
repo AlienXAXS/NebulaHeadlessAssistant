@@ -8,9 +8,13 @@ using UnityEngine;
 
 namespace NebulaHeadlessAssistant.Patches
 {
-    internal class InitialGame
+    internal class GameUtility
     {
-
+        /// <summary>
+        /// This is used to let the plugin know when the game has fully loaded the save file.
+        /// This way all information in the game is present and ready to be read.
+        /// </summary>
+        /// <param name="__instance"></param>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GameLoader), nameof(GameLoader.FixedUpdate))]
         public static void Tick(ref GameLoader __instance)

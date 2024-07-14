@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using System.Reflection;
+using UnityEngine;
 
 [assembly: ObfuscateAssembly(assemblyIsPrivate: true, StripAfterObfuscation = true)]
 
@@ -23,6 +24,11 @@ namespace NebulaHeadlessAssistant
             {
                 Log.LogInfo(">> Cannot load, nebula mod not found");
             }
+        }
+
+        void OnGUI()
+        {
+            NebulaHeadlessAssistant.Instance.OnGUI();
         }
     }
 }

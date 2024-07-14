@@ -16,10 +16,15 @@ namespace NebulaHeadlessAssistant.HiveRestorer
         public static HiveRestorerManager Instance = _instance ??= new HiveRestorerManager();
 
         private readonly Dictionary<int,string> _hiveDataRecorderValues = new();
-        private bool IsFaulted;
+        private bool IsActive;
         private int PlayerCount;
 
-        private const string FileName = "hiveData.json"; 
+        private const string FileName = "hiveData.json";
+
+        public void Init()
+        {
+            IsActive = true;
+        }
 
         public void ReadHiveDataFromGame()
         {
@@ -102,7 +107,7 @@ namespace NebulaHeadlessAssistant.HiveRestorer
             catch (Exception ex)
             {
                 Log.LogError(ex);
-                IsFaulted = true;
+                IsActive = true;
             }
         }
 
@@ -161,7 +166,7 @@ namespace NebulaHeadlessAssistant.HiveRestorer
             catch (Exception ex)
             {
                 Log.LogError(ex);
-                IsFaulted = true;
+                IsActive = true;
             }
         }
 
@@ -204,7 +209,7 @@ namespace NebulaHeadlessAssistant.HiveRestorer
 
         public void PlayerJoined()
         {
-            if (IsFaulted) return;
+            if (!IsActive) return;
 
             // Check if PlayerCount was zero, if so we need to restore the threat.
             if (PlayerCount == 0)
@@ -218,20 +223,22 @@ namespace NebulaHeadlessAssistant.HiveRestorer
 
         public void PlayerLeft()
         {
-            if (IsFaulted) return;
+            if (!IsActive) return;
 
             --PlayerCount;
 
             if (PlayerCount == 0)
             {
                 SaveGameState();
-                Log.LogInfo("Server is empty, setting Dark Fog to be 'Dummy'");
-                SetHiveAgressiveness(EAggressiveLevel.Dummy);
+                //Log.LogInfo("Server is empty, setting Dark Fog to be 'Dummy'");
+                //SetHiveAgressiveness(EAggressiveLevel.Dummy);
             }
         }
 
         public void FirstStart()
         {
+            if (!IsActive) return;
+
             // We have a file, we should load it to ensure the correct state is in the game, as it
             // is possible the server closed without warning.
             if (System.IO.File.Exists(FileName))

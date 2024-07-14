@@ -36,5 +36,17 @@
     <Reference Include="NebulaAPI">
       <HintPath>..\lib\NebulaAPI.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>H:\Dyson Sphere Program Headless\Dyson Sphere Program Server\DSPGAME_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>H:\Dyson Sphere Program Headless\Dyson Sphere Program Server\DSPGAME_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>H:\Dyson Sphere Program Headless\Dyson Sphere Program Server\DSPGAME_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>H:\Dyson Sphere Program Headless\Dyson Sphere Program Server\DSPGAME_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
