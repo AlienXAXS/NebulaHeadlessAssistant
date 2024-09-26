@@ -24,10 +24,5 @@ namespace NebulaHeadlessAssistant
                 Log.LogInfo(">> Cannot load, nebula mod not found");
             }
         }
-
-        void OnGUI()
-        {
-            NebulaHeadlessAssistant.Instance.OnGUI();
-        }
     }
 }

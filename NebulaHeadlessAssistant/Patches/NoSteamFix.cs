@@ -21,7 +21,7 @@ namespace NebulaHeadlessAssistant.Patches
             // Force the game to thinking steam has successfully initialised.
             __instance.m_bInitialized = true;
 
-            Log.LogInfo($"SteamManager Platform: {AccountData.me.platform} UserId: {AccountData.me.userId} UserName: {AccountData.me.detail.userName}");
+            Log.LogInfo($"[NebulaHeadlessAssistant] SteamManager Platform: {AccountData.me.platform} UserId: {AccountData.me.userId} UserName: {AccountData.me.detail.userName}");
 
             return false;
         }
@@ -39,7 +39,7 @@ namespace NebulaHeadlessAssistant.Patches
         {
             if (__instance != null)
             {
-                Log.LogInfo($"Patched a call to {__instance.GetType().Name}");
+                Log.LogInfo($"[NebulaHeadlessAssistant] Patched a call to {__instance.GetType().Name}");
             }
 
             return false;
